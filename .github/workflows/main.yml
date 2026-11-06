@@ -1,11 +1,15 @@
+
 name: Secure DevSecOps CI/CD Pipeline
 
 on:
   push:
-    branches: [ "main" ]
+    branches: [main]
   pull_request:
-    branches: [ "main" ]
+    branches: [main]
   workflow_dispatch:
+
+permissions:
+  contents: read
 
 jobs:
   security-and-build:
@@ -28,7 +32,7 @@ jobs:
 
       - name: Run Unit Tests
         run: |
-          python -m unittest discover -v
+          python -m unittest discover -s . -p "test*.py" -v
 
       - name: Run Bandit Security Scan
         run: |
@@ -43,5 +47,4 @@ jobs:
           docker build -t secure-devsecops-app:github-actions .
 
       - name: Pipeline Completed
-        run: |
-          echo "Secure DevSecOps CI/CD Pipeline Completed Successfully!"
+        run: echo "Secure DevSecOps CI/CD Pipeline Completed!"
