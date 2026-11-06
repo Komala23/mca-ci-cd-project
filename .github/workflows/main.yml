@@ -1,0 +1,47 @@
+name: Secure DevSecOps CI/CD Pipeline
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+  workflow_dispatch:
+
+jobs:
+  security-and-build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Source Code
+        uses: actions/checkout@v4
+
+      - name: Set Up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install Dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          pip install bandit pip-audit
+
+      - name: Run Unit Tests
+        run: |
+          python -m unittest discover -v
+
+      - name: Run Bandit Security Scan
+        run: |
+          bandit -r app.py
+
+      - name: Run Dependency Vulnerability Scan
+        run: |
+          pip-audit -r requirements.txt
+
+      - name: Build Docker Image
+        run: |
+          docker build -t secure-devsecops-app:github-actions .
+
+      - name: Pipeline Completed
+        run: |
+          echo "Secure DevSecOps CI/CD Pipeline Completed Successfully!"
